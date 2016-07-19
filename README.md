@@ -1,2 +1,2 @@
-# scalatest-play-async
-scalatest AsyncTestSuite helpers for Play Framework testing
+# play-test-ops
+Async helpers for testing Play Framework with async test suites.
