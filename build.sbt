@@ -9,6 +9,8 @@ publish := {}
 
 val commonSettings = Seq(
 
+  scalaVersion := "2.11.7",
+
   scalacOptions ++= Seq(
     "-encoding", "UTF-8",
     "-deprecation:false",
