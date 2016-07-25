@@ -1,23 +1,30 @@
 package play.api.test.ops
 
-import org.scalatest.{Args, AsyncFreeSpec, Status => TestStatus}
+import org.scalatest.{Args, FutureOutcome, fixture, Status => TestStatus}
 import play.api.http.{MimeTypes, Status}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import play.api.test._
 import play.api.{Application, Play}
 
-class AsyncResultExtractorsSpec extends AsyncFreeSpec with AsyncResultExtractors
+class AsyncResultExtractorsSpec extends fixture.AsyncFreeSpec
   with EssentialActionCaller
   with Writeables {
 
   implicit lazy val app: Application = FakeApplication()
+  import app.materializer
+
+  class FixtureParam {
+    object extractors extends AsyncResultExtractors
+  }
+
+  override def withFixture(test: OneArgAsyncTest): FutureOutcome = test(new FixtureParam)
 
   protected override def runTests(testName: Option[String], args: Args): TestStatus = {
     // Use a single application for all the suites
     Play.start(app)
     val resultStatus = super.runTests(testName, args)
-    resultStatus.whenCompleted(_ => Play.stop())
+    resultStatus.whenCompleted(_ => Play.stop(app))
     resultStatus
   }
 
@@ -60,9 +67,10 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec with AsyncResultExtractors
     }
   }
 
-  def testSubject(methodName: String) = s"play23.AsyncResultExtrators.$methodName"
+  protected def testSubject(methodName: String) = s"play25.AsyncResultExtrators.$methodName"
 
-  s"${testSubject(methodName = "status")} should return the status code" in {
+  s"${testSubject(methodName = "status")} should return the status code" in { fixture =>
+    import fixture.extractors._
     val ctrl = new TestEchoController
     val request = FakeRequest("POST", "/test/status")
     for {
@@ -74,7 +82,8 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec with AsyncResultExtractors
     }
   }
 
-  s"${testSubject(methodName = "contentType")} should extract the expected content type" in {
+  s"${testSubject(methodName = "contentType")} should extract the expected content type" in { fixture =>
+    import fixture.extractors._
     val ctrl = new TestEchoController
     val testJson = Json.obj()
     val request = FakeRequest("POST", "/test/contentType").withJsonBody(testJson)
@@ -87,12 +96,13 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec with AsyncResultExtractors
     }
   }
 
-  s"${testSubject(methodName = "charset")} should extract the expected charset" in {
+  s"${testSubject(methodName = "charset")} should extract the expected charset" in { fixture =>
+    import fixture.extractors._
     val ctrl = new TestEchoController
-    val testJson = Json.obj()
-    val request = FakeRequest("POST", "/test/charset").withJsonBody(testJson)
+    val testString = "test"
+    val request = FakeRequest("POST", "/test/charset").withTextBody(testString)
     for {
-      result <- call(ctrl.echoJsonBody, request)
+      result <- call(ctrl.echoTextBody, request)
     } yield {
       assertResult(Some(Codec.utf_8.charset)) {
         charset(result)
@@ -100,7 +110,8 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec with AsyncResultExtractors
     }
   }
 
-  s"${testSubject(methodName = "contentAsString")} should extract the expected text" in {
+  s"${testSubject(methodName = "contentAsString")} should extract the expected text" in { fixture =>
+    import fixture.extractors._
     val ctrl = new TestEchoController
     val testString = "test"
     val request = FakeRequest("POST", "/test/text").withTextBody(testString)
@@ -114,7 +125,8 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec with AsyncResultExtractors
     }
   }
 
-  s"${testSubject(methodName = "contentAsJson")} should extract the expected json" in {
+  s"${testSubject(methodName = "contentAsJson")} should extract the expected json" in { fixture =>
+    import fixture.extractors._
     val ctrl = new TestEchoController
     val testJson = Json.obj("expected" -> "json")
     val request = FakeRequest("POST", "/test/json").withJsonBody(testJson)
@@ -128,7 +140,8 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec with AsyncResultExtractors
     }
   }
 
-  s"${testSubject(methodName = "header")} should extract the expected header" in {
+  s"${testSubject(methodName = "header")} should extract the expected header" in { fixture =>
+    import fixture.extractors._
     val ctrl = new TestEchoController
     val expectedHeaderName = "expected"
     val expectedHeaderValue = "value"
@@ -145,7 +158,8 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec with AsyncResultExtractors
     }
   }
 
-  s"${testSubject(methodName = "cookies")} should extract the expected cookie" in {
+  s"${testSubject(methodName = "cookies")} should extract the expected cookie" in { fixture =>
+    import fixture.extractors._
     val ctrl = new TestEchoController
     val expectedCookie = Cookie("expected", "cookie")
     val request = FakeRequest("POST", "/test/cookie").withJsonBody(Json.obj(
@@ -161,7 +175,8 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec with AsyncResultExtractors
     }
   }
 
-  s"${testSubject(methodName = "session")} should extract the expected session data" in {
+  s"${testSubject(methodName = "session")} should extract the expected session data" in { fixture =>
+    import fixture.extractors._
     val ctrl = new TestEchoController
     val expectedSession = Session(Map("k1" -> "v1", "k2" -> "v2"))
     val request = FakeRequest("POST", "/test/session").withJsonBody(Json.toJson(expectedSession.data))
@@ -174,7 +189,8 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec with AsyncResultExtractors
     }
   }
 
-  s"${testSubject(methodName = "flash")} should extract the expected flash data" in {
+  s"${testSubject(methodName = "flash")} should extract the expected flash data" in { fixture =>
+    import fixture.extractors._
     val ctrl = new TestEchoController
     val expectedFlash = Flash(Map("k1" -> "v1", "k2" -> "v2"))
     val request = FakeRequest("POST", "/test/flash").withJsonBody(Json.toJson(expectedFlash.data))
@@ -187,7 +203,8 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec with AsyncResultExtractors
     }
   }
 
-  s"${testSubject(methodName = "redirectLocation")} should extract the expected redirect url from 301" in {
+  s"${testSubject(methodName = "redirectLocation")} should extract the expected redirect url from 301" in { fixture =>
+    import fixture.extractors._
     val ctrl = new TestEchoController
     val redirectUrl = "test redirect"
     val request = FakeRequest("POST", "/test/redirect").withJsonBody(Json.obj(
@@ -203,7 +220,8 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec with AsyncResultExtractors
     }
   }
 
-  s"${testSubject(methodName = "redirectLocation")} should extract the expected redirect url from 302" in {
+  s"${testSubject(methodName = "redirectLocation")} should extract the expected redirect url from 302" in { fixture =>
+    import fixture.extractors._
     val ctrl = new TestEchoController
     val redirectUrl = "test redirect"
     val request = FakeRequest("POST", "/test/redirect").withJsonBody(Json.obj(
@@ -219,7 +237,8 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec with AsyncResultExtractors
     }
   }
 
-  s"${testSubject(methodName = "redirectLocation")} should extract the expected redirect url from 303" in {
+  s"${testSubject(methodName = "redirectLocation")} should extract the expected redirect url from 303" in { fixture =>
+    import fixture.extractors._
     val ctrl = new TestEchoController
     val redirectUrl = "test redirect"
     val request = FakeRequest("POST", "/test/redirect").withJsonBody(Json.obj(
@@ -235,7 +254,8 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec with AsyncResultExtractors
     }
   }
 
-  s"${testSubject(methodName = "redirectLocation")} should extract the expected redirect url from 307" in {
+  s"${testSubject(methodName = "redirectLocation")} should extract the expected redirect url from 307" in { fixture =>
+    import fixture.extractors._
     val ctrl = new TestEchoController
     val redirectUrl = "test redirect"
     val request = FakeRequest("POST", "/test/redirect").withJsonBody(Json.obj(
@@ -251,7 +271,8 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec with AsyncResultExtractors
     }
   }
 
-  s"${testSubject(methodName = "redirectLocation")} should NOT extract a redirect url from a 400" in {
+  s"${testSubject(methodName = "redirectLocation")} should NOT extract a redirect url from a 400" in { fixture =>
+    import fixture.extractors._
     val ctrl = new TestEchoController
     val redirectUrl = "test redirect"
     val request = FakeRequest("POST", "/test/redirect").withJsonBody(Json.obj(
@@ -267,5 +288,4 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec with AsyncResultExtractors
     }
   }
 }
-
 

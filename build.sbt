@@ -10,11 +10,13 @@ val commonRootSettings = Seq(
 lazy val root = (project in file("."))
   .settings(commonRootSettings)
   .settings(
+    name := "root",
     // don't publish the surrounding multi-project root
     publish := {}
   )
   .aggregate(
-    `play23-test-ops-core`
+    `play23-core`,
+    `play25-core`
   )
 
 val commonSettings = commonRootSettings ++ Seq(
@@ -47,14 +49,26 @@ val commonSettings = commonRootSettings ++ Seq(
   licenses += ("Apache-2.0", url("http://opensource.org/licenses/apache-2.0"))
 )
 
-lazy val `play23-test-ops-core` = (project in file("play23-core"))
-  .settings(commonSettings)
+lazy val playVersion = settingKey[String]("The version of Play Framework")
+
+val coreCommonSettings = commonSettings ++ Seq(
+  libraryDependencies ++= Seq(
+    "com.typesafe.play" %% "play" % playVersion.value,
+    "com.typesafe.play" %% "play-test" % playVersion.value % "test",
+    "org.scalatest" %% "scalatest" % "3.0.0-RC4" % "test"
+  )
+)
+
+lazy val `play23-core` = (project in file("play23-core"))
+  .settings(coreCommonSettings)
   .settings(
     name := "play23-test-ops-core",
-    libraryDependencies ++= Seq(
-      "com.typesafe.play" %% "play" % "2.3.10",
-      "com.typesafe.play" %% "play-test" % "2.3.10" % "test",
-      "org.scalatest" %% "scalatest" % "3.0.0-RC4" % "test"
-    )
+    playVersion := "2.3.10"
   )
 
+lazy val `play25-core` = (project in file("play25-core"))
+  .settings(coreCommonSettings)
+  .settings(
+    name := "play25-test-ops-core",
+    playVersion := "2.5.3"
+  )
