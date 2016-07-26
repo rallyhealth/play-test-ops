@@ -21,7 +21,7 @@ lazy val root = (project in file("."))
 
 val commonSettings = commonRootSettings ++ Seq(
 
-  version := "0.2.0",
+  version := "0.2.1",
 
   scalacOptions ++= Seq(
     "-encoding", "UTF-8",
