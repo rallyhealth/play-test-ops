@@ -7,11 +7,17 @@
 <table>
   <tr>
     <th>play23-test-ops-core</th>
+    <th>play25-test-ops-core</th>
   </tr>
   <tr>
     <td>
       <a href='https://bintray.com/jeffmay/maven/play23-test-ops-core/_latestVersion'>
         <img src='https://api.bintray.com/packages/jeffmay/maven/play23-test-ops-core/images/download.svg'>
+      </a>
+    </td>
+    <td>
+      <a href='https://bintray.com/jeffmay/maven/play25-test-ops-core/_latestVersion'>
+        <img src='https://api.bintray.com/packages/jeffmay/maven/play25-test-ops-core/images/download.svg'>
       </a>
     </td>
   </tr>
