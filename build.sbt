@@ -4,7 +4,7 @@ val commonRootSettings = Seq(
   organizationName := "Jeff May",
   
   // set the scala version on the root project
-  scalaVersion := "2.11.7"
+  scalaVersion := "2.11.8"
 )
 
 lazy val root = (project in file("."))
@@ -21,7 +21,7 @@ lazy val root = (project in file("."))
 
 val commonSettings = commonRootSettings ++ Seq(
 
-  version := "0.2.1",
+  version := "0.2.2",
 
   scalacOptions ++= Seq(
     "-encoding", "UTF-8",
@@ -55,7 +55,7 @@ val coreCommonSettings = commonSettings ++ Seq(
   libraryDependencies ++= Seq(
     "com.typesafe.play" %% "play" % playVersion.value,
     "com.typesafe.play" %% "play-test" % playVersion.value % "test",
-    "org.scalatest" %% "scalatest" % "3.0.0-RC4" % "test"
+    "org.scalatest" %% "scalatest" % "3.0.0" % "test"
   )
 )
 
