@@ -1,6 +1,7 @@
 package play.api.test.ops
 
-import akka.stream.Materializer
+import akka.actor.Cancellable
+import akka.stream.{Attributes, ClosedShape, Graph, Materializer}
 import akka.util.ByteString
 import play.api.http.HeaderNames._
 import play.api.http.Status._
@@ -9,7 +10,8 @@ import play.api.libs.streams.Accumulator
 import play.api.mvc._
 import play.twirl.api.Content
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
 /**
   * Similar to play.api.test.ResultExtractors except that it is designed to work better
@@ -52,7 +54,7 @@ trait AsyncResultExtractors {
     * Extracts the Content-Type of this Result value.
     */
   def contentType(result: Accumulator[ByteString, Result])(
-    implicit ec: ExecutionContext, mat: Materializer): Future[Option[String]] = {
+    implicit ec: ExecutionContext, mat: Materializer = NoMaterializer): Future[Option[String]] = {
     result.run() map contentType
   }
 
@@ -69,21 +71,21 @@ trait AsyncResultExtractors {
   /**
     * Extracts the content as String.
     */
-  def contentAsString(result: Result)(implicit ec: ExecutionContext, mat: Materializer): Future[String] = {
+  def contentAsString(result: Result)(implicit ec: ExecutionContext, mat: Materializer = NoMaterializer): Future[String] = {
     contentAsBytes(result).map(_.decodeString(charset(result).getOrElse("utf-8")))
   }
 
   /**
     * Extracts the content as bytes.
     */
-  def contentAsBytes(result: Result)(implicit mat: Materializer): Future[ByteString] = {
+  def contentAsBytes(result: Result)(implicit mat: Materializer = NoMaterializer): Future[ByteString] = {
     result.body.consumeData
   }
 
   /**
     * Extracts the content as Json.
     */
-  def contentAsJson(result: Result)(implicit ec: ExecutionContext, mat: Materializer): Future[JsValue] = {
+  def contentAsJson(result: Result)(implicit ec: ExecutionContext, mat: Materializer = NoMaterializer): Future[JsValue] = {
     contentAsString(result).map(Json.parse)
   }
 
@@ -129,3 +131,31 @@ trait AsyncResultExtractors {
     */
   def headers(result: Result): Map[String, String] = result.header.headers
 }
+
+// $COVERAGE-OFF$
+/**
+  * In 99% of cases, when running tests against the result body, you don't actually need a materializer since it's a
+  * strict body. So, rather than always requiring an implicit materializer, we use one if provided, otherwise we have
+  * a default one that simply throws an exception if used.
+  */
+private[ops] object NoMaterializer extends Materializer {
+
+  override def withNamePrefix(name: String): Materializer =
+    throw new UnsupportedOperationException("NoMaterializer cannot be named")
+
+  override def materialize[Mat](runnable: Graph[ClosedShape, Mat]): Mat =
+    throw new UnsupportedOperationException("NoMaterializer cannot materialize")
+
+  override def materialize[Mat](runnable: Graph[ClosedShape, Mat], initialAttributes: Attributes): Mat =
+    throw new UnsupportedOperationException("NoMaterializer cannot materialize")
+
+  override def executionContext: ExecutionContextExecutor =
+    throw new UnsupportedOperationException("NoMaterializer does not provide an ExecutionContext")
+
+  override def scheduleOnce(delay: FiniteDuration, task: Runnable): Cancellable =
+    throw new UnsupportedOperationException("NoMaterializer cannot schedule a single event")
+
+  override def schedulePeriodically(initialDelay: FiniteDuration, interval: FiniteDuration, task: Runnable): Cancellable =
+    throw new UnsupportedOperationException("NoMaterializer cannot schedule a repeated event")
+}
+// $COVERAGE-ON$

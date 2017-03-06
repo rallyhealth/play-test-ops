@@ -55,7 +55,7 @@ val coreCommonSettings = commonSettings ++ Seq(
   libraryDependencies ++= Seq(
     "com.typesafe.play" %% "play" % playVersion.value,
     "com.typesafe.play" %% "play-test" % playVersion.value % "test",
-    "org.scalatest" %% "scalatest" % "3.0.0" % "test"
+    "org.scalatest" %% "scalatest" % "3.0.0" % Test
   )
 )
 
@@ -70,5 +70,5 @@ lazy val `play25-core` = (project in file("play25-core"))
   .settings(coreCommonSettings)
   .settings(
     name := "play25-test-ops-core",
-    playVersion := "2.5.3"
+    playVersion := "2.5.12"
   )
