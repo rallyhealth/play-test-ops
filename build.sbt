@@ -4,7 +4,11 @@ val commonRootSettings = Seq(
   organizationName := "Jeff May",
   
   // set the scala version on the root project
-  scalaVersion := "2.11.8"
+  scalaVersion := "2.11.8",
+
+  // fail the build if the coverage drops below the minimum
+  coverageFailOnMinimum := true,
+  coverageMinimum := 80
 )
 
 lazy val root = (project in file("."))
@@ -52,6 +56,7 @@ val commonSettings = commonRootSettings ++ Seq(
 lazy val playVersion = settingKey[String]("The version of Play Framework")
 
 val coreCommonSettings = commonSettings ++ Seq(
+  coverageMinimum := 80,
   libraryDependencies ++= Seq(
     "com.typesafe.play" %% "play" % playVersion.value,
     "com.typesafe.play" %% "play-test" % playVersion.value % "test",
