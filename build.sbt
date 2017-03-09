@@ -4,7 +4,11 @@ val commonRootSettings = Seq(
   organizationName := "Jeff May",
   
   // set the scala version on the root project
-  scalaVersion := "2.11.8"
+  scalaVersion := "2.11.8",
+
+  // fail the build if the coverage drops below the minimum
+  coverageFailOnMinimum := true,
+  coverageMinimum := 80
 )
 
 lazy val root = (project in file("."))
@@ -21,7 +25,7 @@ lazy val root = (project in file("."))
 
 val commonSettings = commonRootSettings ++ Seq(
 
-  version := "0.2.2",
+  version := "1.0.0-RC1",
 
   scalacOptions ++= Seq(
     "-encoding", "UTF-8",
@@ -52,10 +56,11 @@ val commonSettings = commonRootSettings ++ Seq(
 lazy val playVersion = settingKey[String]("The version of Play Framework")
 
 val coreCommonSettings = commonSettings ++ Seq(
+  coverageMinimum := 80,
   libraryDependencies ++= Seq(
     "com.typesafe.play" %% "play" % playVersion.value,
     "com.typesafe.play" %% "play-test" % playVersion.value % "test",
-    "org.scalatest" %% "scalatest" % "3.0.0" % "test"
+    "org.scalatest" %% "scalatest" % "3.0.0" % Test
   )
 )
 
@@ -70,5 +75,5 @@ lazy val `play25-core` = (project in file("play25-core"))
   .settings(coreCommonSettings)
   .settings(
     name := "play25-test-ops-core",
-    playVersion := "2.5.3"
+    playVersion := "2.5.12"
   )
