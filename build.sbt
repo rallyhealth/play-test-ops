@@ -27,6 +27,8 @@ val commonSettings = commonRootSettings ++ Seq(
 
   version := "1.0.0",
 
+  scalaVersion := "2.11.7",
+
   scalacOptions ++= Seq(
     "-encoding", "UTF-8",
     "-deprecation:false",
