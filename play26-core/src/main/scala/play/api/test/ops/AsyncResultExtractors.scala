@@ -6,7 +6,6 @@ import akka.util.ByteString
 import play.api.http.HeaderNames._
 import play.api.http.Status._
 import play.api.libs.json.{JsValue, Json}
-import play.api.libs.streams.Accumulator
 import play.api.mvc._
 import play.twirl.api.Content
 
@@ -22,41 +21,6 @@ import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
   * down on processor usage.
   */
 trait AsyncResultExtractors {
-
-  //$COVERAGE-OFF$
-  /**
-    * Extracts the Content-Type of this Content value.
-    */
-  @deprecated("Use _.contentType instead.", "1.1.0")
-  def contentType(of: Content): String = of.contentType
-
-  /**
-    * Extracts the content as String.
-    */
-  @deprecated("Use _.body instead.", "1.1.0")
-  def contentAsString(of: Content): String = of.body
-
-  /**
-    * Extracts the content as bytes.
-    */
-  @deprecated("Use _.body.getBytes instead.", "1.1.0")
-  def contentAsBytes(of: Content): Array[Byte] = of.body.getBytes
-
-  /**
-    * Extracts the content as Json.
-    */
-  @deprecated("Use Json.parse(_.body) instead.", "1.1.0")
-  def contentAsJson(of: Content): JsValue = Json.parse(of.body)
-
-  /**
-    * Extracts the Content-Type of this Result value.
-    */
-  @deprecated("Use for action.run().map(contentType) instead.", "1.1.0")
-  def contentType(result: Accumulator[ByteString, Result])(
-    implicit ec: ExecutionContext, mat: Materializer = NoMaterializer): Future[Option[String]] = {
-    result.run() map contentType
-  }
-  // $COVERAGE-ON$
 
   /**
     * Extracts the Content-Type of this Result value.
@@ -102,19 +66,28 @@ trait AsyncResultExtractors {
   def status(result: Result): Int = result.header.status
 
   /**
-    * Extracts the Cookies set by this Result value.
+    * Gets the Cookies associated with this Result value. Note that this only extracts the "new" cookies added to
+    * this result (e.g. through withCookies), not including the Session or Flash. The final set of cookies may be
+    * different because the Play server automatically adds those cookies and merges the headers.
     */
-  def cookies(result: Result): Cookies = Cookies.fromSetCookieHeader(header(SET_COOKIE, result))
+  def cookies(result: Result): Cookies = {
+    val cookies = result.newCookies
+    new Cookies {
+      private final val cookiesByName: Map[String, Cookie] = cookies.groupBy(_.name).mapValues(_.head)
+      final override def get(name: String): Option[Cookie] = cookiesByName.get(name)
+      final override def foreach[U](f: Cookie => U): Unit = cookies.foreach(f)
+    }
+  }
 
   /**
     * Extracts the Flash values set by this Result value.
     */
-  def flash(result: Result): Flash = Flash.decodeFromCookie(cookies(result).get(Flash.COOKIE_NAME))
+  def flash(result: Result): Flash = result.newFlash.getOrElse(new Flash())
 
   /**
     * Extracts the Session values set by this Result value.
     */
-  def session(result: Result): Session = Session.decodeFromCookie(cookies(result).get(Session.COOKIE_NAME))
+  def session(result: Result): Session = result.newSession.getOrElse(new Session())
 
   /**
     * Extracts the Location header of this Result value if this Result is a Redirect.

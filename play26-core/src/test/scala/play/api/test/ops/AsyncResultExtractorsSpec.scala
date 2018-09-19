@@ -3,6 +3,7 @@ package play.api.test.ops
 import akka.stream.Materializer
 import org.scalatest.{Args, AsyncFreeSpec, Status => TestStatus}
 import play.api.http.{MimeTypes, Status}
+import play.api.inject.guice.{GuiceApplicationBuilder, GuiceApplicationLoader}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import play.api.test._
@@ -15,9 +16,11 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec
   with EssentialActionCaller
   with Writeables {
 
-  implicit private lazy val app: Application = FakeApplication()
+  implicit private lazy val app: Application = GuiceApplicationBuilder().build()
   implicit private lazy val mat: Materializer = app.materializer
   implicit private lazy val ec: ExecutionContext = mat.executionContext
+
+  private lazy val components: ControllerComponents = app.injector.instanceOf[ControllerComponents]
 
   protected override def runTests(testName: Option[String], args: Args): TestStatus = {
     // Use a single application for all the suites
@@ -27,7 +30,7 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec
     resultStatus
   }
 
-  class TestEchoController extends Controller {
+  class TestEchoController extends AbstractController(components) {
 
     def echoTextBody: EssentialAction = Action { request =>
       Ok(request.body.asText.getOrElse("Missing body"))
@@ -37,36 +40,36 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec
       Ok(request.body)
     }
 
-    def echoJsonInHeader: EssentialAction = Action(parse.json) { request =>
+    def echoJsonInHeader: Action[JsValue] = Action(parse.json) { request =>
       val name = (request.body \ "name").as[String]
       val value = (request.body \ "value").as[String]
       Ok.withHeaders(name -> value)
     }
 
-    def echoJsonInCookie: EssentialAction = Action(parse.json) { request =>
+    def echoJsonInCookie: Action[JsValue] = Action(parse.json) { request =>
       val name = (request.body \ "name").as[String]
       val value = (request.body \ "value").as[String]
       Ok.withCookies(Cookie(name, value))
     }
 
-    def echoJsonInSession: EssentialAction = Action(parse.json) { request =>
+    def echoJsonInSession: Action[JsValue] = Action(parse.json) { request =>
       val sessionData = request.body.as[Map[String, String]]
       Ok.withSession(sessionData.toSeq: _*)
     }
 
-    def echoJsonInFlash: EssentialAction = Action(parse.json) { request =>
+    def echoJsonInFlash: Action[JsValue] = Action(parse.json) { request =>
       val flashData = request.body.as[Map[String, String]]
       Ok.flashing(flashData.toSeq: _*)
     }
 
-    def redirectToBody: EssentialAction = Action(parse.json) { request =>
+    def redirectToBody: Action[JsValue] = Action(parse.json) { request =>
       val url = (request.body \ "url").as[String]
       val status = (request.body \ "status").as[Int]
       Redirect(url, status)
     }
   }
 
-  protected def method(name: String) = s"play25.AsyncResultExtractors.$name"
+  protected def method(name: String) = s"play26.AsyncResultExtractors.$name"
 
   behave like parsesContentUsing("app.materializer", app.materializer)
   behave like parsesContentUsing("NoMaterializer", NoMaterializer)
@@ -114,7 +117,7 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec
     }
   }
 
-  s"${method("contentType")} should extract the expected content type" in {
+  s"${method("contentType")} should extract the expected content type from the full result" in {
     val ctrl = new TestEchoController
     val testJson = Json.obj()
     val request = FakeRequest("POST", "/test/contentType").withJsonBody(testJson)

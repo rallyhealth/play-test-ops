@@ -11,7 +11,7 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec with AsyncResultExtractors
   with EssentialActionCaller
   with Writeables {
 
-  implicit lazy val app: Application = FakeApplication()
+  implicit private lazy val app: Application = FakeApplication()
 
   protected override def runTests(testName: Option[String], args: Args): TestStatus = {
     // Use a single application for all the suites
