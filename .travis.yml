@@ -1,11 +1,12 @@
 language: scala
 scala:
-  - 2.11.7
+  - 2.11.12
+  - 2.12.6
 jdk:
-  - oraclejdk8
+  - openjdk8
 
 script:
-  - sbt clean coverage test coverageReport && sbt coverageAggregate
+  - sbt clean coverage +test coverageReport && sbt coverageAggregate
 after_success:
   - sbt coveralls
 
@@ -18,4 +19,3 @@ cache:
   directories:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot/
-
