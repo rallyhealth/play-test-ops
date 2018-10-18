@@ -1,27 +1,9 @@
-<a href='https://travis-ci.org/jeffmay/play-test-ops'>
-  <img src='https://travis-ci.org/jeffmay/play-test-ops.svg' alt='Build Status' />
-</a>
-<a href='https://coveralls.io/github/jeffmay/play-test-ops?branch=master'>
-  <img src='https://coveralls.io/repos/jeffmay/play-test-ops/badge.svg?branch=master&service=github' alt='Coverage Status' />
-</a>
-<table>
-  <tr>
-    <th>play23-test-ops-core</th>
-    <th>play25-test-ops-core</th>
-  </tr>
-  <tr>
-    <td>
-      <a href='https://bintray.com/jeffmay/maven/play23-test-ops-core/_latestVersion'>
-        <img src='https://api.bintray.com/packages/jeffmay/maven/play23-test-ops-core/images/download.svg'>
-      </a>
-    </td>
-    <td>
-      <a href='https://bintray.com/jeffmay/maven/play25-test-ops-core/_latestVersion'>
-        <img src='https://api.bintray.com/packages/jeffmay/maven/play25-test-ops-core/images/download.svg'>
-      </a>
-    </td>
-  </tr>
-</table>
+[![Build Status](https://travis-ci.org/rallyhealth/play-test-ops.svg?branch=master)](https://travis-ci.org/rallyhealth/play-test-ops)
+[![codecov](https://codecov.io/gh/rallyhealth/play-test-ops/branch/master/graph/badge.svg)](https://codecov.io/gh/rallyhealth/play-test-ops)
+
+| play23-test-ops-core | play25-test-ops-core |
+| :------------------: | :------------------: |
+| [ ![Download](https://api.bintray.com/packages/rallyhealth/maven/play23-test-ops-core/images/download.svg) ](https://bintray.com/rallyhealth/maven/play23-test-ops-core/_latestVersion) | [ ![Download](https://api.bintray.com/packages/rallyhealth/maven/play25-test-ops-core/images/download.svg) ](https://bintray.com/rallyhealth/maven/play25-test-ops-core/_latestVersion) |
 
 # Introduction
 

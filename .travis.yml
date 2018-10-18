@@ -9,7 +9,7 @@ script:
 
 after_success:
   # Upload coverage reports to codecov.io
-  - bash <(curl -s https://codecov.io/bash) -t 60a8d8f2-fa0c-4bd5-8631-539c4e6bcf37
+  - bash <(curl -s https://codecov.io/bash)
 
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
