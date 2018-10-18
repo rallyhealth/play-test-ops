@@ -2,13 +2,16 @@ import Dependencies._
 
 name := "play-test-ops-root"
 
-ThisBuild / organization := "me.jeffmay"
-ThisBuild / organizationName := "Jeff May"
+ThisBuild / organization := "com.rallyhealth"
+ThisBuild / organizationName := "Rally Health"
 
 // set the scala version on the root project
 ThisBuild / scalaVersion := Scala_2_11
 
-ThisBuild / licenses += ("Apache-2.0", url("http://opensource.org/licenses/apache-2.0"))
+ThisBuild / bintrayOrganization := Some("rallyhealth")
+ThisBuild / bintrayRepository := "maven"
+
+ThisBuild / licenses += ("MIT", url("https://opensource.org/licenses/MIT"))
 
 def commonProject(id: String, path: String): Project = {
   Project(id, file(path)).settings(
@@ -48,13 +51,14 @@ def coreProject(includePlayVersion: String): Project = {
     name := s"play$playSuffix-test-ops-core",
     scalaVersion := scalaVersions.head,
     crossScalaVersions := scalaVersions,
-    semVerEnforceAfterVersion := Some("1.1.0"),
+    semVerEnforceAfterVersion := Some("1.2.0"),
     // fail the build if the coverage drops below the minimum
     coverageMinimum := 80,
     coverageFailOnMinimum := true,
     // add library dependencies
     resolvers ++= Seq(
-      "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/"
+      "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/",
+      Resolver.bintrayRepo("rallyhealth", "maven")
     ),
     libraryDependencies ++= Seq(
       playServer(includePlayVersion)

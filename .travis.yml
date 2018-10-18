@@ -1,14 +1,15 @@
 language: scala
 scala:
   - 2.11.12
-  - 2.12.6
 jdk:
   - openjdk8
 
 script:
-  - sbt clean coverage +test coverageReport && sbt coverageAggregate
+  - sbt clean +coverage +test +coverageReport && sbt coverageAggregate
+
 after_success:
-  - sbt coveralls
+  # Upload coverage reports to codecov.io
+  - bash <(curl -s https://codecov.io/bash) -t 60a8d8f2-fa0c-4bd5-8631-539c4e6bcf37
 
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
