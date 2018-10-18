@@ -51,7 +51,6 @@ def coreProject(includePlayVersion: String): Project = {
     name := s"play$playSuffix-test-ops-core",
     scalaVersion := scalaVersions.head,
     crossScalaVersions := scalaVersions,
-    semVerEnforceAfterVersion := Some("1.2.0"),
     // fail the build if the coverage drops below the minimum
     coverageMinimum := 80,
     coverageFailOnMinimum := true,
