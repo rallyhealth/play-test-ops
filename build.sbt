@@ -13,8 +13,29 @@ ThisBuild / bintrayRepository := "maven"
 
 ThisBuild / licenses += ("MIT", url("https://opensource.org/licenses/MIT"))
 
+/**
+  * Semantic versioning attempts to validate that the version generated makes sense relative to previous
+  * versions released. We are introducing support for new Scala versions in this release, so the semVerCheck
+  * will fail. This setting will ensure that we don't forget to re-enable it after this release.
+  */
+val suppressSemVerCheckOfNewScalaVersionsUntilNextVersion = semVerCheck := {
+  version.value match {
+    case VersionNumber(Seq(1, 1, 1, _*), _, _) => Def.task {}
+    case _ =>
+      throw new RuntimeException(s"Version bump! Time to remove the suppression of semver checking.")
+  }
+  Def.taskDyn {
+    scalaVersion.value match {
+      case VersionNumber(Seq(2, 11 | 12, _*), _, _) => semVerCheck
+      case _ => Def.task {}
+    }
+  }
+}
+
 def commonProject(id: String, path: String): Project = {
   Project(id, file(path)).settings(
+
+    suppressSemVerCheckOfNewScalaVersionsUntilNextVersion,
 
     scalacOptions ++= Seq(
       "-encoding", "UTF-8",
@@ -38,13 +59,14 @@ def commonProject(id: String, path: String): Project = {
 
 def coreProject(includePlayVersion: String): Project = {
   val playSuffix = includePlayVersion match {
-    case Play_2_3 => "23"
     case Play_2_5 => "25"
     case Play_2_6 => "26"
+    case Play_2_7 => "27"
   }
   val scalaVersions = includePlayVersion match {
-    case Play_2_3 | Play_2_5 => Seq(Scala_2_11)
+    case Play_2_5 => Seq(Scala_2_11)
     case Play_2_6 => Seq(Scala_2_11, Scala_2_12)
+    case Play_2_7 => Seq(Scala_2_12, Scala_2_13)
   }
   val path = s"play$playSuffix-core"
   commonProject(path, path).settings(
@@ -69,9 +91,9 @@ def coreProject(includePlayVersion: String): Project = {
   )
 }
 
-lazy val `play23-core` = coreProject(Play_2_3)
 lazy val `play25-core` = coreProject(Play_2_5)
 lazy val `play26-core` = coreProject(Play_2_6)
+lazy val `play27-core` = coreProject(Play_2_7)
 
 // don't publish the root project
 publish := {}
