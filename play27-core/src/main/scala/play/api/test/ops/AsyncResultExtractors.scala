@@ -69,14 +69,7 @@ trait AsyncResultExtractors {
     * this result (e.g. through withCookies), not including the Session or Flash. The final set of cookies may be
     * different because the Play server automatically adds those cookies and merges the headers.
     */
-  def cookies(result: Result): Cookies = {
-    val cookies = result.newCookies
-    new Cookies {
-      private final val cookiesByName: Map[String, Cookie] = cookies.groupBy(_.name).mapValues(_.head)
-      final override def get(name: String): Option[Cookie] = cookiesByName.get(name)
-      final override def foreach[U](f: Cookie => U): Unit = cookies.foreach(f)
-    }
-  }
+  def cookies(result: Result): Cookies = Cookies(result.newCookies)
 
   /**
     * Extracts the Flash values set by this Result value.
