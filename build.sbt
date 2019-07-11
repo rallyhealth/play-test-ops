@@ -20,7 +20,7 @@ ThisBuild / licenses += ("MIT", url("https://opensource.org/licenses/MIT"))
   */
 val suppressSemVerCheckOfNewScalaVersionsUntilNextVersion = semVerCheck := {
   version.value match {
-    case VersionNumber(Seq(1, 1, 1, _*), _, _) => Def.task {}
+    case VersionNumber(Seq(1, 1, x, _*), _, _) if x <= 3 => Def.task {}
     case _ =>
       throw new RuntimeException(s"Version bump! Time to remove the suppression of semver checking.")
   }
