@@ -20,7 +20,7 @@ ThisBuild / licenses += ("MIT", url("https://opensource.org/licenses/MIT"))
   */
 val suppressSemVerCheckOfNewScalaVersionsUntilNextVersion = semVerCheck := {
   version.value match {
-    case VersionNumber(Seq(1, 1, x, _*), _, _) if x <= 3 => Def.task {}
+    case VersionNumber(Seq(1, 1, x, _*), _, _) if x <= 4 => Def.task {}
     case _ =>
       throw new RuntimeException(s"Version bump! Time to remove the suppression of semver checking.")
   }
@@ -31,6 +31,10 @@ val suppressSemVerCheckOfNewScalaVersionsUntilNextVersion = semVerCheck := {
     }
   }
 }
+
+// don't publish the jars for the root project (http://stackoverflow.com/a/8789341)
+publish / skip := true
+publishLocal / skip := true
 
 def commonProject(id: String, path: String): Project = {
   Project(id, file(path)).settings(
@@ -71,7 +75,6 @@ def coreProject(includePlayVersion: String): Project = {
   val path = s"play$playSuffix-core"
   commonProject(path, path).settings(
     name := s"play$playSuffix-test-ops-core",
-    scalaVersion := scalaVersions.head,
     crossScalaVersions := scalaVersions,
     // fail the build if the coverage drops below the minimum
     coverageMinimum := 80,
@@ -94,7 +97,3 @@ def coreProject(includePlayVersion: String): Project = {
 lazy val `play25-core` = coreProject(Play_2_5)
 lazy val `play26-core` = coreProject(Play_2_6)
 lazy val `play27-core` = coreProject(Play_2_7)
-
-// don't publish the root project
-publish := {}
-publishLocal := {}
