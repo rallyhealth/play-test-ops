@@ -1,39 +1,36 @@
 package play.api.test.ops
 
-import akka.stream.Materializer
-import org.scalatest.{Args, AsyncFreeSpec, Status => TestStatus}
+import akka.actor.ActorSystem
+import akka.stream.{ActorMaterializer, Materializer}
+import org.scalatest.{AsyncFreeSpec, BeforeAndAfterAll}
 import play.api.http.{MimeTypes, Status}
-import play.api.inject.guice.{GuiceApplicationBuilder, GuiceApplicationLoader}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import play.api.test._
-import play.api.{Application, Play}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.Await
+import scala.concurrent.duration._
 
 class AsyncResultExtractorsSpec extends AsyncFreeSpec
+  with BeforeAndAfterAll
   with AsyncResultExtractors
   with EssentialActionCaller
   with Writeables {
 
-  implicit private lazy val app: Application = GuiceApplicationBuilder().build()
-  implicit private lazy val mat: Materializer = app.materializer
-  implicit private lazy val ec: ExecutionContext = mat.executionContext
+  implicit private lazy val sys: ActorSystem = ActorSystem(getClass.getSimpleName)
+  implicit private lazy val mat: Materializer = ActorMaterializer()
 
-  private lazy val components: ControllerComponents = app.injector.instanceOf[ControllerComponents]
-
-  protected override def runTests(testName: Option[String], args: Args): TestStatus = {
-    // Use a single application for all the suites
-    Play.start(app)
-    val resultStatus = super.runTests(testName, args)
-    resultStatus.whenCompleted(_ => Play.stop(app))
-    resultStatus
+  override protected def afterAll(): Unit = {
+    Await.ready(sys.terminate(), 1.second)
   }
 
-  class TestEchoController extends AbstractController(components) {
+  class TestEchoController extends AbstractController(Helpers.stubControllerComponents(
+    playBodyParsers = Helpers.stubPlayBodyParsers(mat),
+    executionContext = executionContext
+  )) {
 
-    def echoTextBody: EssentialAction = Action { request =>
-      Ok(request.body.asText.getOrElse("Missing body"))
+    def echoTextBody: EssentialAction = Action(parse.tolerantText) { request =>
+      Ok(request.body)
     }
 
     def echoJsonBody: Action[JsValue] = Action(parse.json) { request =>
@@ -71,7 +68,7 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec
 
   protected def method(name: String) = s"play26.AsyncResultExtractors.$name"
 
-  behave like parsesContentUsing("app.materializer", app.materializer)
+  behave like parsesContentUsing("ActorMaterializer", mat)
   behave like parsesContentUsing("NoMaterializer", NoMaterializer)
 
   protected def parsesContentUsing(materializerName: String, contentMaterializer: Materializer): Unit = {
