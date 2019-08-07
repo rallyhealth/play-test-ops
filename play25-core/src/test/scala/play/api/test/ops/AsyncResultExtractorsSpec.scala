@@ -68,7 +68,7 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec
 
   protected def method(name: String) = s"play25.AsyncResultExtractors.$name"
 
-  behave like parsesContentUsing("app.materializer", app.materializer)
+  behave like parsesContentUsing("ActorMaterializer", app.materializer)
   behave like parsesContentUsing("NoMaterializer", NoMaterializer)
 
   protected def parsesContentUsing(materializerName: String, contentMaterializer: Materializer): Unit = {
