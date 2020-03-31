@@ -5,9 +5,6 @@ name := "play-test-ops-root"
 ThisBuild / organization := "com.rallyhealth"
 ThisBuild / organizationName := "Rally Health"
 
-// set the scala version on the root project
-ThisBuild / scalaVersion := Scala_2_11
-
 ThisBuild / bintrayOrganization := Some("rallyhealth")
 ThisBuild / bintrayRepository := "maven"
 
@@ -24,8 +21,8 @@ publishLocal / skip := true
   */
 val suppressSemVerCheckOfNewScalaVersionsUntilNextVersion = semVerCheck := {
   version.value match {
-    case VersionNumber(Seq(1, 1, 3 | 4, _*), _, _) => Def.task {}
-    case VersionNumber(Seq(1, 2, 0, _*), _, _) => Def.task {}
+    case VersionNumber(Seq(1, 2, 0 | 1, _*), _, _) => Def.task {}
+    case VersionNumber(Seq(1, 3, 0, _*), _, _) => Def.task {}
     case _ =>
       throw new RuntimeException(s"Version bump! Time to remove the suppression of semver checking.")
   }
@@ -69,18 +66,19 @@ def coreProject(includePlayVersion: String): Project = {
   val scalaVersions = includePlayVersion match {
     case Play_2_5 => Seq(Scala_2_11)
     case Play_2_6 => Seq(Scala_2_11, Scala_2_12)
-    case Play_2_7 => Seq(Scala_2_12, Scala_2_13)
+    case Play_2_7 => Seq(Scala_2_11, Scala_2_12, Scala_2_13)
   }
   val path = s"play$playSuffix-core"
   commonProject(path, path).settings(
     name := s"play$playSuffix-test-ops-core",
+    scalaVersion := scalaVersions.head,
     crossScalaVersions := scalaVersions,
     // fail the build if the coverage drops below the minimum
     coverageMinimum := 80,
     coverageFailOnMinimum := true,
     // add library dependencies
     resolvers ++= Seq(
-      "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/",
+      "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/",
       Resolver.bintrayRepo("rallyhealth", "maven")
     ),
     libraryDependencies ++= Seq(

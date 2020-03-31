@@ -6,7 +6,7 @@ jdk:
   - openjdk11
 
 script:
-  - sbt clean +coverage +test +coverageReport && sbt coverageAggregate
+  - sbt clean +coverage +test coverageAggregate
 
 after_success:
   # Upload coverage reports to codecov.io
