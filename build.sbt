@@ -16,21 +16,14 @@ publishLocal / skip := true
 
 /**
   * Semantic versioning attempts to validate that the version generated makes sense relative to previous
-  * versions released. We are introducing support for new Scala versions in this release, so the semVerCheck
+  * versions released. We are introducing a new module this release, so the semVerCheck
   * will fail. This setting will ensure that we don't forget to re-enable it after this release.
   */
-val suppressSemVerCheckOfNewScalaVersionsUntilNextVersion = semVerCheck := {
+val suppressSemVerCheckOfNewModuleUntilNextVersion = semVerCheck := {
   version.value match {
-    case VersionNumber(Seq(1, 2, 0 | 1, _*), _, _) => Def.task {}
-    case VersionNumber(Seq(1, 3, 0, _*), _, _) => Def.task {}
+    case VersionNumber(Seq(1, 3, 0 | 1, _*), _, _) => Def.task {}
     case _ =>
       throw new RuntimeException(s"Version bump! Time to remove the suppression of semver checking.")
-  }
-  Def.taskDyn {
-    scalaVersion.value match {
-      case VersionNumber(Seq(2, 12, _*), _, _) => Def.task {}
-      case _ => semVerCheck
-    }
   }
 }
 
@@ -94,13 +87,9 @@ def coreProject(includePlayVersion: String): Project = {
 }
 
 lazy val `play25-core` = coreProject(Play_2_5)
-lazy val `play26-core` = coreProject(Play_2_6).settings(
-  suppressSemVerCheckOfNewScalaVersionsUntilNextVersion
-)
-lazy val `play27-core` = coreProject(Play_2_7).settings(
-  suppressSemVerCheckOfNewScalaVersionsUntilNextVersion
-)
+lazy val `play26-core` = coreProject(Play_2_6)
+lazy val `play27-core` = coreProject(Play_2_7)
 lazy val `play28-core` = coreProject(Play_2_8).settings(
-  suppressSemVerCheckOfNewScalaVersionsUntilNextVersion,
+  suppressSemVerCheckOfNewModuleUntilNextVersion,
   libraryDependencies ++= Seq(playTest(Play_2_8))
 )
