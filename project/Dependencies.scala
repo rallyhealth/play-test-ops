@@ -9,6 +9,7 @@ object Dependencies {
   final val Play_2_5 = "2.5.19"
   final val Play_2_6 = "2.6.19"
   final val Play_2_7 = "2.7.4"
+  final val Play_2_8 = "2.8.3"
 
   def playServer(includePlayVersion: String): ModuleID = {
     "com.typesafe.play" %% "play" % includePlayVersion

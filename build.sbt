@@ -62,11 +62,13 @@ def coreProject(includePlayVersion: String): Project = {
     case Play_2_5 => "25"
     case Play_2_6 => "26"
     case Play_2_7 => "27"
+    case Play_2_8 => "28"
   }
   val scalaVersions = includePlayVersion match {
     case Play_2_5 => Seq(Scala_2_11)
     case Play_2_6 => Seq(Scala_2_11, Scala_2_12)
     case Play_2_7 => Seq(Scala_2_11, Scala_2_12, Scala_2_13)
+    case Play_2_8 => Seq(Scala_2_12, Scala_2_13)
   }
   val path = s"play$playSuffix-core"
   commonProject(path, path).settings(
@@ -97,4 +99,8 @@ lazy val `play26-core` = coreProject(Play_2_6).settings(
 )
 lazy val `play27-core` = coreProject(Play_2_7).settings(
   suppressSemVerCheckOfNewScalaVersionsUntilNextVersion
+)
+lazy val `play28-core` = coreProject(Play_2_8).settings(
+  suppressSemVerCheckOfNewScalaVersionsUntilNextVersion,
+  libraryDependencies ++= Seq(playTest(Play_2_8))
 )
