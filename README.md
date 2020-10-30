@@ -1,9 +1,9 @@
 [![Build Status](https://travis-ci.org/rallyhealth/play-test-ops.svg?branch=master)](https://travis-ci.org/rallyhealth/play-test-ops)
 [![codecov](https://codecov.io/gh/rallyhealth/play-test-ops/branch/master/graph/badge.svg)](https://codecov.io/gh/rallyhealth/play-test-ops)
 
-| play25-test-ops-core | play26-test-ops-core | play27-test-ops-core |
-| :------------------: | :------------------: | :------------------: |
-| [ ![Download](https://api.bintray.com/packages/rallyhealth/maven/play25-test-ops-core/images/download.svg) ](https://bintray.com/rallyhealth/maven/play25-test-ops-core/_latestVersion) | [ ![Download](https://api.bintray.com/packages/rallyhealth/maven/play26-test-ops-core/images/download.svg) ](https://bintray.com/rallyhealth/maven/play26-test-ops-core/_latestVersion) | [ ![Download](https://api.bintray.com/packages/rallyhealth/maven/play27-test-ops-core/images/download.svg) ](https://bintray.com/rallyhealth/maven/play27-test-ops-core/_latestVersion) |
+| play25-test-ops-core | play26-test-ops-core | play27-test-ops-core | play28-test-ops-core |
+| :------------------: | :------------------: | :------------------: | :------------------: |
+| [ ![Download](https://api.bintray.com/packages/rallyhealth/maven/play25-test-ops-core/images/download.svg) ](https://bintray.com/rallyhealth/maven/play25-test-ops-core/_latestVersion) | [ ![Download](https://api.bintray.com/packages/rallyhealth/maven/play26-test-ops-core/images/download.svg) ](https://bintray.com/rallyhealth/maven/play26-test-ops-core/_latestVersion) | [ ![Download](https://api.bintray.com/packages/rallyhealth/maven/play27-test-ops-core/images/download.svg) ](https://bintray.com/rallyhealth/maven/play27-test-ops-core/_latestVersion) | [ ![Download](https://api.bintray.com/packages/rallyhealth/maven/play28-test-ops-core/images/download.svg) ](https://bintray.com/rallyhealth/maven/play28-test-ops-core/_latestVersion) |
 
 # Introduction
 
