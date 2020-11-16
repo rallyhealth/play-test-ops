@@ -21,7 +21,8 @@ publishLocal / skip := true
   */
 val suppressSemVerCheckOfNewModuleUntilNextVersion = semVerCheck := {
   version.value match {
-    case VersionNumber(Seq(1, 3, 0 | 1, _*), _, _) => Def.task {}
+    case VersionNumber(Seq(1, x, _*), _, _) if x <= 3 => Def.task {}
+    case VersionNumber(Seq(1, 4, 0, _*), _, _) => Def.task {}
     case _ =>
       throw new RuntimeException(s"Version bump! Time to remove the suppression of semver checking.")
   }
