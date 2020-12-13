@@ -2,9 +2,10 @@ package play.api.test.ops
 
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
+import org.scalatest.freespec.AsyncFreeSpec
 // Despite the package name this is from play-test
 import akka.stream.testkit.NoMaterializer
-import org.scalatest.{AsyncFreeSpec, BeforeAndAfterAll}
+import org.scalatest.BeforeAndAfterAll
 import play.api.http.{MimeTypes, Status}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._

@@ -5,53 +5,46 @@ name := "play-test-ops-root"
 ThisBuild / organization := "com.rallyhealth"
 ThisBuild / organizationName := "Rally Health"
 
+ThisBuild / scalaVersion := "2.13.5"
+
 ThisBuild / bintrayOrganization := Some("rallyhealth")
 ThisBuild / bintrayRepository := "maven"
 
 ThisBuild / licenses += ("MIT", url("https://opensource.org/licenses/MIT"))
 
+// reload sbt when the build files change
+Global / onChangedBuildSource := ReloadOnSourceChanges
+
 // don't publish the jars for the root project (http://stackoverflow.com/a/8789341)
 publish / skip := true
 publishLocal / skip := true
 
-/**
-  * Semantic versioning attempts to validate that the version generated makes sense relative to previous
-  * versions released. We are introducing a new module this release, so the semVerCheck
-  * will fail. This setting will ensure that we don't forget to re-enable it after this release.
-  */
-val suppressSemVerCheckOfNewModuleUntilNextVersion = semVerCheck := {
-  version.value match {
-    case VersionNumber(Seq(1, x, _*), _, _) if x <= 3 => Def.task {}
-    case VersionNumber(Seq(1, 4, 0, _*), _, _) => Def.task {}
-    case _ =>
-      throw new RuntimeException(s"Version bump! Time to remove the suppression of semver checking.")
-  }
-}
+// don't search for previous artifact of the root project
+mimaFailOnNoPrevious := false
 
 def commonProject(id: String, path: String): Project = {
   Project(id, file(path)).settings(
-
     scalacOptions ++= Seq(
-      "-encoding", "UTF-8",
+      "-encoding",
+      "UTF-8",
       "-deprecation:false",
       "-feature",
       "-Xfatal-warnings",
       "-Ywarn-dead-code"
     ),
-
     // don't publish the test code
     Test / publishArtifact := false,
-
     // disable compilation of ScalaDocs, since this always breaks on links
     Compile / doc / sources := Seq.empty,
-
     // disable publishing empty ScalaDocs
     Compile / packageDoc / publishArtifact := false
-
-  ).enablePlugins(SemVerPlugin)
+  )
 }
 
-def coreProject(includePlayVersion: String): Project = {
+def coreProject(
+  includePlayVersion: String,
+  previousVersions: Set[String] = Set("1.4.0"),
+): Project = {
   val playSuffix = includePlayVersion match {
     case Play_2_5 => "25"
     case Play_2_6 => "26"
@@ -69,17 +62,19 @@ def coreProject(includePlayVersion: String): Project = {
     name := s"play$playSuffix-test-ops-core",
     scalaVersion := scalaVersions.head,
     crossScalaVersions := scalaVersions,
+    mimaPreviousArtifacts := previousVersions.map(
+      "com.rallyhealth" %% name.value % _
+    ),
     // fail the build if the coverage drops below the minimum
     coverageMinimum := 80,
     coverageFailOnMinimum := true,
     // add library dependencies
     resolvers ++= Seq(
-      "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/",
-      Resolver.bintrayRepo("rallyhealth", "maven")
+      // TODO: Remove this after next release. This is only needed to find the previous version for mima.
+      Resolver.bintrayRepo("rallyhealth", "maven"),
+      "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/"
     ),
-    libraryDependencies ++= Seq(
-      playServer(includePlayVersion)
-    ) ++ Seq(
+    libraryDependencies ++= Seq(playServer(includePlayVersion)) ++ Seq(
       // Test-only dependencies
       playTest(includePlayVersion),
       scalaTest
@@ -91,6 +86,5 @@ lazy val `play25-core` = coreProject(Play_2_5)
 lazy val `play26-core` = coreProject(Play_2_6)
 lazy val `play27-core` = coreProject(Play_2_7)
 lazy val `play28-core` = coreProject(Play_2_8).settings(
-  suppressSemVerCheckOfNewModuleUntilNextVersion,
   libraryDependencies ++= Seq(playTest(Play_2_8))
 )

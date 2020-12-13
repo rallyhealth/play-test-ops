@@ -1,7 +1,8 @@
 package play.api.test.ops
 
 import akka.stream.Materializer
-import org.scalatest.{Args, AsyncFreeSpec, Status => TestStatus}
+import org.scalatest.freespec.AsyncFreeSpec
+import org.scalatest.{Args, Status => TestStatus}
 import play.api.http.{MimeTypes, Status}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
