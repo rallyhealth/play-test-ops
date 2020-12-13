@@ -4,6 +4,7 @@ import akka.stream.Materializer
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.{Args, Status => TestStatus}
 import play.api.http.{MimeTypes, Status}
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import play.api.test._
@@ -16,7 +17,7 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec
   with EssentialActionCaller
   with Writeables {
 
-  implicit private lazy val app: Application = FakeApplication()
+  private lazy val app: Application = GuiceApplicationBuilder().build()
   implicit private lazy val mat: Materializer = app.materializer
   implicit private lazy val ec: ExecutionContext = mat.executionContext
 

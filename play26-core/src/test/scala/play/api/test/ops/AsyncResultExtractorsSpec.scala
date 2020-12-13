@@ -9,7 +9,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import play.api.test._
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
 
 class AsyncResultExtractorsSpec extends AsyncFreeSpec
@@ -18,6 +18,7 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec
   with EssentialActionCaller
   with Writeables {
 
+  override implicit val executionContext: ExecutionContext = ExecutionContext.global
   implicit private lazy val sys: ActorSystem = ActorSystem(getClass.getSimpleName)
   implicit private lazy val mat: Materializer = ActorMaterializer()
 
