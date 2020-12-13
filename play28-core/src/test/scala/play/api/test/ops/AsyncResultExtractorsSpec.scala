@@ -1,7 +1,7 @@
 package play.api.test.ops
 
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, Materializer}
+import akka.stream.Materializer
 import org.scalatest.freespec.AsyncFreeSpec
 // Despite the package name this is from play-test
 import akka.stream.testkit.NoMaterializer
@@ -20,8 +20,8 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec
   with EssentialActionCaller
   with Writeables {
 
-  implicit private lazy val sys: ActorSystem = ActorSystem(getClass.getSimpleName)
-  implicit private lazy val mat: Materializer = ActorMaterializer()
+  private lazy val sys: ActorSystem = ActorSystem(getClass.getSimpleName)
+  implicit private lazy val mat: Materializer = Materializer(sys)
 
   override protected def afterAll(): Unit = {
     Await.ready(sys.terminate(), 1.second)
