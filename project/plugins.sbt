@@ -1,5 +1,4 @@
-resolvers += Resolver.bintrayIvyRepo("rallyhealth", "sbt-plugins")
-
-addSbtPlugin("com.rallyhealth.sbt" %% "sbt-git-versioning" % "1.4.0")
-addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.4")
+addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.1.1")
+addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.8.1")
+addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.6.1")
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.1")
