@@ -5,15 +5,17 @@ name := "play-test-ops-root"
 ThisBuild / organization := "com.rallyhealth"
 ThisBuild / organizationName := "Rally Health"
 
+ThisBuild / versionScheme := Some("early-semver")
 ThisBuild / scalaVersion := "2.13.5"
-
-ThisBuild / bintrayOrganization := Some("rallyhealth")
-ThisBuild / bintrayRepository := "maven"
-
 ThisBuild / licenses += ("MIT", url("https://opensource.org/licenses/MIT"))
 
 // reload sbt when the build files change
 Global / onChangedBuildSource := ReloadOnSourceChanges
+
+// if you contribute to this library, please add yourself to this list!
+developers := List(
+  Developer(id = "jeffmay", name = "Jeff May", email = "jeff.n.may@gmail.com", url = url("https://github.com/jeffmay")),
+)
 
 // don't publish the jars for the root project (http://stackoverflow.com/a/8789341)
 publish / skip := true
