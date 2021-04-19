@@ -1,6 +1,7 @@
 import Dependencies._
 
 name := "play-test-ops-root"
+scalaVersion := "2.13.5"
 
 ThisBuild / organization := "com.rallyhealth"
 ThisBuild / organizationName := "Rally Health"
@@ -12,14 +13,14 @@ ThisBuild / licenses += ("MIT", url("https://opensource.org/licenses/MIT"))
 // reload sbt when the build files change
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
+ThisBuild / homepage := Some(url("https://github.com/play-test-ops"))
 // if you contribute to this library, please add yourself to this list!
-developers := List(
+ThisBuild / developers := List(
   Developer(id = "jeffmay", name = "Jeff May", email = "jeff.n.may@gmail.com", url = url("https://github.com/jeffmay")),
 )
 
 // don't publish the jars for the root project (http://stackoverflow.com/a/8789341)
 publish / skip := true
-publishLocal / skip := true
 
 // don't search for previous artifact of the root project
 mimaFailOnNoPrevious := false
@@ -43,10 +44,7 @@ def commonProject(id: String, path: String): Project = {
   )
 }
 
-def coreProject(
-  includePlayVersion: String,
-  previousVersions: Set[String] = Set("1.4.0"),
-): Project = {
+def coreProject(includePlayVersion: String): Project = {
   val playSuffix = includePlayVersion match {
     case Play_2_5 => "25"
     case Play_2_6 => "26"
@@ -64,18 +62,13 @@ def coreProject(
     name := s"play$playSuffix-test-ops-core",
     scalaVersion := scalaVersions.head,
     crossScalaVersions := scalaVersions,
-    mimaPreviousArtifacts := previousVersions.map(
-      "com.rallyhealth" %% name.value % _
+    mimaPreviousArtifacts := Set(
+      organization.value %% name.value % "1.5.0"
     ),
     // fail the build if the coverage drops below the minimum
     coverageMinimum := 80,
     coverageFailOnMinimum := true,
     // add library dependencies
-    resolvers ++= Seq(
-      // TODO: Remove this after next release. This is only needed to find the previous version for mima.
-      Resolver.bintrayRepo("rallyhealth", "maven"),
-      "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/"
-    ),
     libraryDependencies ++= Seq(playServer(includePlayVersion)) ++ Seq(
       // Test-only dependencies
       playTest(includePlayVersion),
