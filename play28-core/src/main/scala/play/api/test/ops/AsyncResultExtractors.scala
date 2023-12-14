@@ -1,9 +1,6 @@
 package play.api.test.ops
 
-import akka.stream.Materializer
-// Despite the package name this is from play-test
-import akka.stream.testkit.NoMaterializer
-import akka.util.ByteString
+import play.api.test.ops.ActorTypes._
 import play.api.http.HeaderNames._
 import play.api.http.Status._
 import play.api.libs.json.{JsValue, Json}
