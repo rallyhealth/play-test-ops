@@ -1,10 +1,7 @@
 package play.api.test.ops
 
-import akka.actor.ActorSystem
-import akka.stream.Materializer
+import play.api.test.ops.ActorTypes._
 import org.scalatest.freespec.AsyncFreeSpec
-// Despite the package name this is from play-test
-import akka.stream.testkit.NoMaterializer
 import org.scalatest.BeforeAndAfterAll
 import play.api.http.{MimeTypes, Status}
 import play.api.libs.json.{JsValue, Json}
@@ -70,7 +67,7 @@ class AsyncResultExtractorsSpec extends AsyncFreeSpec
     }
   }
 
-  protected def method(name: String) = s"play27.AsyncResultExtractors.$name"
+  protected def method(name: String) = s"play28+.AsyncResultExtractors.$name"
 
   behave like parsesContentUsing("ActorMaterializer", mat)
   behave like parsesContentUsing("NoMaterializer", NoMaterializer)
